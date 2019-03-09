@@ -1,6 +1,6 @@
 from app.daos.env import env
 
-MONGO_URI = env('MONGODB_URI', default='mongodb://localhost:27017/brain-bit')
+MONGO_URI = env('MONGODB_URI')
 
 IF_MATCH = False
 PAGINATION_LIMIT = 1000
