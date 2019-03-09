@@ -1,0 +1,15 @@
+boto3
+environs
+eve
+Flask
+pymongo
+
+
+# non-functional
+pytest
+
+bandit
+coveralls
+coverage
+pylint
+tox

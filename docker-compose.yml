@@ -1,0 +1,14 @@
+web:
+  build: .
+  container_name: brain-bit-api
+  ports:
+  - "5000:5000"
+  volumes:
+  - .:/src
+  links:
+  - db
+
+db:
+  image: mongo:3.0.2
+  ports:
+  - "27017:27017"
