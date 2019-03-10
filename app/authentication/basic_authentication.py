@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask import request, Response
 
-from app.daos.env import env
+from app.utils.env import env
 
 
 def check_auth(username, password):

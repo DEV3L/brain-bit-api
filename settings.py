@@ -1,4 +1,4 @@
-from app.daos.env import env
+from app.utils.env import env
 
 MONGO_URI = env('MONGODB_URI')
 

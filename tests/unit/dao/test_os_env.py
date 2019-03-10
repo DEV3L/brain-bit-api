@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from app.daos.env import env
+from app.utils.env import env
 
 
 @patch('app.daos.env.os')

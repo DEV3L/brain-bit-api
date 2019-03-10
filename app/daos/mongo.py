@@ -3,7 +3,7 @@ import os
 from bson import ObjectId
 from pymongo import MongoClient
 
-from app.daos.env import env
+from app.utils.env import env
 
 
 class MongoDatabase:
@@ -26,4 +26,4 @@ class MongoDatabase:
         return self.mongo_db[collection].find_one({'_id': ObjectId(id)})
 
     def find(self, collection: str, query: dict = None):
-        return self.mongo_db[collection].find(query)
+        return self.mongo_db[collection].find(query, limit=999999)

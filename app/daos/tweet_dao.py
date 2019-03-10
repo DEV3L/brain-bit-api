@@ -1,12 +1,12 @@
 from bson import ObjectId
 
+from app.daos.dao import Dao
 from app.models.tweet import Tweet
 
 
-class TweetDao:
+class TweetDao(Dao):
     def __init__(self, mongo_database):
-        self._mongo_database = mongo_database
-        self._collection = 'tweets'
+        super().__init__(mongo_database, 'tweets')
 
     def create(self, tweet_model: Tweet):
         json = tweet_model.to_json()

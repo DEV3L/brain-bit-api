@@ -4,12 +4,11 @@ from eve import Eve
 from flask import render_template, request
 
 from app.authentication.basic_authentication import requires_auth
-from app.daos.env import env
-from app.daos.tweet_dao import TweetDao
 from app.daos.mongo import MongoDatabase
+from app.daos.tweet_dao import TweetDao
 from app.services.logging_service import LoggingService
 from app.services.run_service import get_json_data
-
+from app.utils.env import env
 
 logger = LoggingService('app').logger
 logger.info("Start Brain-Bit API Application!")

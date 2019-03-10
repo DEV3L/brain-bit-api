@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from app.daos.env import env
+from app.utils.env import env
 
 default_level = env('DEFAULT_LOGGING_LEVEL', default=logging.INFO)
 default_logging_format = env('DEFAULT_LOGGING_FORMAT',
