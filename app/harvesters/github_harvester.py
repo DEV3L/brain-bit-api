@@ -57,30 +57,53 @@ class GithubHarvester:
         github_events = self.github_event_dao.find_all(query={'actor': github_username})
         github_events_by_id = {github_event['id']: github_event for github_event in github_events}
 
-        event_record_ids = []
+        sessions_page = 1
+        sessions_repos = []
 
-        page = 1
-        events_url = f'https://api.github.com/users/{github_username}/events?page={page}'
-        events = json.loads(self.github_session.get(events_url).text)
+        session_user_repos_url = f'https://api.github.com/user/repos?page={sessions_page}'
+        session_user_repos = json.loads(self.github_session.get(session_user_repos_url).text)
 
-        while events:
-            if 'message' in events:
+        while session_user_repos:
+            if 'message' in session_user_repos:
                 logger.info(events['message'])
+
+                if events['message'] == 'Bad credentials':
+                    raise RuntimeError('Bad credentials')
+
                 break
 
-            for event in events:
-                if event['id'] in github_events_by_id.keys():
-                    continue
+            sessions_repos.extend(session_user_repos)
 
-                github_event = GithubEvent(event)
+            sessions_page = sessions_page + 1
+            session_user_repos_url = f'https://api.github.com/user/repos?page={sessions_page}'
+            session_user_repos = json.loads(self.github_session.get(session_user_repos_url).text)
 
-                github_event_record = self.github_event_dao.create(github_event)
-                event_record_ids.append(github_event_record)
+        username_page = 1
+        username_repos = []
 
-            page = page + 1
-            events = self._get_events(github_username, page)
+        github_username_repos_url = f'https://api.github.com/users/{github_username}/repos'
+        github_username_repos = json.loads(self.github_session.get(github_username_repos_url).text)
 
-        return event_record_ids
+        while github_username_repos:
+            if 'message' in session_user_repos:
+                logger.info(events['message'])
+
+                if events['message'] == 'Bad credentials':
+                    raise RuntimeError('Bad credentials')
+
+                break
+
+            username_repos.extend(github_username_repos)
+
+            username_page = username_page + 1
+            github_username_repos_url = f'https://api.github.com/users/{github_username}/repos?page={username_page}'
+            github_username_repos = json.loads(self.github_session.get(github_username_repos_url).text)
+
+        print(sessions_repos)
+        print(username_repos)
+
+        return session_user_repos, github_username_repos
+
 
 
 DEFAULT_USERNAME = os.environ['GITHUB_USERNAME']

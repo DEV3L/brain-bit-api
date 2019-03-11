@@ -5,4 +5,5 @@ from app.harvesters.github_harvester import GithubHarvester
 github_username = 'DEV3L'
 
 github_retriever = GithubHarvester(GithubEventDao(MongoDatabase()))
-github_retriever.harvest_events_for_user(github_username)
+# github_retriever.harvest_events_for_user(github_username)
+github_retriever.harvest_repos_for_user(github_username)
