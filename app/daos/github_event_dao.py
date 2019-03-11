@@ -3,7 +3,7 @@ from app.models.github_event import GithubEvent
 
 
 class GithubEventDao(Dao):
-    def __init__(self, mongo_database):
+    def __init__(self, mongo_database: MongoDatabase):
         super().__init__(mongo_database, 'github_events')
 
     def _to_json(self, object_record: dict) -> GithubEvent:
