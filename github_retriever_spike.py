@@ -1,6 +1,6 @@
 import json
 
-from app.daos.github_events_dao import GithubEventDao
+from app.daos.github_event_dao import GithubEventDao
 from app.daos.mongo import MongoDatabase
 from app.models.github_event import GithubEvent
 from app.retrievers.github_retriever import GithubRetriever

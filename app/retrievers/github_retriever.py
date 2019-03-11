@@ -4,7 +4,8 @@ import os
 import requests
 from requests import Session
 
-from app.daos.github_events_dao import GithubEventDao
+from app.daos.github_event_dao import GithubEventDao
+from app.models.github_event import GithubEvent
 
 
 class GithubRetriever:
