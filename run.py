@@ -6,7 +6,7 @@ from flask import render_template, request, jsonify
 from app.authentication.basic_authentication import requires_auth
 from app.daos.github_event_dao import GithubEventDao
 from app.daos.mongo import MongoDatabase
-from app.harvesters.github_harvester import GithubHarvester
+from app.harvesters.github_harvester import GithubHarvester, build_github_session
 from app.models.github_event import GithubEvent
 from app.services.logging_service import LoggingService
 from app.services.run_service import get_json_data
@@ -38,7 +38,12 @@ def harvest_github_events():
 
     github_username = parameters['github_username']
 
-    return jsonify(github_harvester.harvest_events_for_user(github_username))
+    _github_harvester = github_harvester
+    if 'github_token' in parameters:
+        _github_harvester = GithubHarvester(GithubEventDao(MongoDatabase()))
+        _github_harvester.github_session = build_github_session(github_username, parameters['github_token'])
+
+    return jsonify(_github_harvester.harvest_events_for_user(github_username))
 
 
 @app.route('/dashboard', methods=['GET'])

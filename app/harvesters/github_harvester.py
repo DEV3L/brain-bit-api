@@ -14,9 +14,46 @@ logger = LoggingService('github_retriever')
 class GithubHarvester:
     def __init__(self, github_event_dao: GithubEventDao):
         self.github_event_dao = github_event_dao
-        self.github_session = _build_session()
+        self.github_session = build_github_session()
 
     def harvest_events_for_user(self, github_username):
+        github_events = self.github_event_dao.find_all(query={'actor': github_username})
+        github_events_by_id = {github_event['id']: github_event for github_event in github_events}
+
+        event_record_ids = []
+
+        page = 1
+        events_url = f'https://api.github.com/users/{github_username}/events?page={page}'
+        events = json.loads(self.github_session.get(events_url).text)
+
+        while events:
+            if 'message' in events:
+                logger.info(events['message'])
+
+                if events['message'] == 'Bad credentials':
+                    raise RuntimeError('Bad credentials')
+
+                break
+
+            for event in events:
+                if event['id'] in github_events_by_id.keys():
+                    continue
+
+                github_event = GithubEvent(event)
+
+                github_event_record = self.github_event_dao.create(github_event)
+                event_record_ids.append(github_event_record)
+
+            page = page + 1
+            events = self._get_events(github_username, page)
+
+        return event_record_ids
+
+    def _get_events(self, github_username, page):
+        events_url = f'https://api.github.com/users/{github_username}/events?page={page}'
+        return json.loads(self.github_session.get(events_url).text)
+
+    def harvest_repos_for_user(self, github_username):
         github_events = self.github_event_dao.find_all(query={'actor': github_username})
         github_events_by_id = {github_event['id']: github_event for github_event in github_events}
 
@@ -45,15 +82,12 @@ class GithubHarvester:
 
         return event_record_ids
 
-    def _get_events(self, github_username, page):
-        events_url = f'https://api.github.com/users/{github_username}/events?page={page}'
-        return json.loads(self.github_session.get(events_url).text)
+
+DEFAULT_USERNAME = os.environ['GITHUB_USERNAME']
+DEFAULT_TOKEN = os.environ['GITHUB_TOKEN']
 
 
-def _build_session() -> Session:
-    username = os.environ['GITHUB_USERNAME']
-    token = os.environ['GITHUB_TOKEN']
-
+def build_github_session(username=DEFAULT_USERNAME, token=DEFAULT_TOKEN) -> Session:
     github_session = requests.Session()
     github_session.auth = (username, token)
 
