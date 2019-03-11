@@ -12,17 +12,8 @@ github_connector = GithubRetriever(github_event_dao)
 github_events = github_event_dao.find_all(query={'actor': github_username})
 github_events_by_id = {github_event['id']: github_event for github_event in github_events}
 
-page = int(len(github_events) / 30) + 1
-
-if page >= 10:
-    print("Github 300 event history limit, starting at first page for new records")
-    page = 1
-
+page = 1
 events_url = f'https://api.github.com/users/{github_username}/events?page={page}'
-
-
-# create a re-usable session object with the user creds in-built
-
 
 events = json.loads(github_connector.github_session.get(events_url).text)
 
@@ -43,5 +34,3 @@ while events:
     page = page + 1
     events_url = f'https://api.github.com/users/{github_username}/events?page={page}'
     events = json.loads(github_connector.github_session.get(events_url).text)
-
-print()
