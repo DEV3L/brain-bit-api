@@ -1,3 +1,5 @@
+import pymongo
+
 from app.daos.dao import Dao
 from app.daos.mongo import MongoDatabase
 from app.models.github_repository import GithubRepository
@@ -9,7 +11,7 @@ class GithubRepositoryDao(Dao):
 
     def find_all(self, *, query: dict = None) -> list:
         results = [result for result in
-                   self._mongo_database.find(self.collection, query).sort("display_name")]
+                   self._mongo_database.find(self.collection, query).sort("updated_at", pymongo.DESCENDING)]
         return results
 
     def _to_json(self, object_record: dict) -> GithubRepository:

@@ -8,7 +8,6 @@ from app.daos.github_event_dao import GithubEventDao
 from app.daos.github_repository_dao import GithubRepositoryDao
 from app.daos.mongo import MongoDatabase
 from app.harvesters.github_harvester import GithubHarvester
-from app.models.github_event import GithubEvent
 from app.services.logging_service import LoggingService
 from app.services.run_service import get_json_data
 from app.utils.env import env
@@ -52,7 +51,6 @@ def github_repositories():
     github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
 
     repositories_to_display = github_repository_dao.find_all(query={'actor': github_user})
-
     return render_template('github_repositories.html', github_repositories=repositories_to_display,
                            repositories_count=len(repositories_to_display), github_user=github_user)
 
@@ -81,7 +79,7 @@ def _github_dashboard(controller_request):
                            commits_count=commits_count, github_user=github_user)
 
 
-def _transform_event(github_event: GithubEvent):
+def _transform_event(github_event):
     github_event['commits_count'] = len(github_event['commits'])
     return github_event
 
