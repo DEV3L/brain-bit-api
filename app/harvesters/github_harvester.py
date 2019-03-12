@@ -60,8 +60,8 @@ class GithubHarvester:
 
         if token:
             repositories.extend(harvest_session_repositories(github_username, token))
-
-        repositories.extend(harvest_public_repositories(github_username, self.github_session))
+        else:
+            repositories.extend(harvest_public_repositories(github_username, self.github_session))
 
         _repositories = [repository for repository in repositories if
                          repository['full_name'] not in github_repositories_by_name]

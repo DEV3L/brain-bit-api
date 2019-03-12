@@ -5,7 +5,7 @@ from app.models.github_repository import GithubRepository
 
 class GithubRepositoryDao(Dao):
     def __init__(self, mongo_database: MongoDatabase):
-        super().__init__(mongo_database, 'github_repos')
+        super().__init__(mongo_database, 'github_repositories')
 
     def find_all(self, *, query: dict = None) -> list:
         results = [result for result in

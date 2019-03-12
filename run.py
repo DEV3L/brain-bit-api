@@ -51,14 +51,10 @@ def harvest_github_events():
 def github_repositories():
     github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
 
-    events_to_display = github_repository_dao.find_all()
-    events_to_display = [_transform_event(github_event) for github_event in events_to_display]
+    repositories_to_display = github_repository_dao.find_all(query={'actor': github_user})
 
-    repos_to_display_dict, commits_count = _build_repos(events_to_display)
-
-    return render_template('index.html', github_events=events_to_display,
-                           github_repos=repos_to_display_dict.values(),
-                           commits_count=commits_count, github_user=github_user)
+    return render_template('github_repositories.html', github_repositories=repositories_to_display,
+                           repositories_count=len(repositories_to_display), github_user=github_user)
 
 
 @app.route('/dashboard', methods=['GET'])
@@ -79,7 +75,7 @@ def _github_dashboard(controller_request):
     events_to_display = github_event_dao.find_all(query={'actor': github_user, 'type': 'PushEvent'})
     events_to_display = [_transform_event(github_event) for github_event in events_to_display]
 
-    repos_to_display_dict, commits_count = _build_repos(events_to_display)
+    repos_to_display_dict, commits_count = _build_repositories(events_to_display)
 
     return render_template('index.html', github_events=events_to_display, github_repos=repos_to_display_dict.values(),
                            commits_count=commits_count, github_user=github_user)
@@ -90,7 +86,7 @@ def _transform_event(github_event: GithubEvent):
     return github_event
 
 
-def _build_repos(events):
+def _build_repositories(events):
     repos_to_display_dict = {}
     commits_count = 0
 
