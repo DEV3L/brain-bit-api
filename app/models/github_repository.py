@@ -1,5 +1,20 @@
 class GithubRepository:
     def __init__(self, repo_record: dict, actor: str):
+        if not repo_record:
+            self.actor = ''
+            self.id = ''
+            self.name = ''
+            self.display_name = ''
+            self.private = ''
+            self.owner = ''
+            self.repo_url = ''
+            self.commits_url = ''
+            self.labels_url = ''
+            self.created_at = ''
+            self.updated_at = ''
+            self.commits = ''
+            return
+
         self.actor = actor
         self.id = repo_record['id']
         self.name = repo_record['full_name']

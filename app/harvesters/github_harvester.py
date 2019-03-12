@@ -83,13 +83,13 @@ class GithubHarvester:
         github_commits = self.github_commit_dao.find_all(query={'actor': username})
         github_commits_by_sha = {commit['sha']: commit for commit in github_commits}
 
-        # repositories
-
         github_repositories = self.github_repository_dao.find_all(query={'actor': username})
-        github_repositories_by_name = {repository['name']: repository for repository in github_repositories}
 
         for repository in github_repositories:
             commits_url = repository['commits_url'][:-6].replace('git/', '')
+
+            if not commits_url:
+                continue
 
             page = 0
             records = []
@@ -99,6 +99,11 @@ class GithubHarvester:
             while page == 0 or records:
                 if 'message' in records:
                     _handle_message(records)
+                    break
+
+                _commits = [commit for commit in records if commit['sha'] not in github_commits_by_sha]
+
+                if page > 0 and not _commits:
                     break
 
                 commits.extend(records)
@@ -119,7 +124,12 @@ class GithubHarvester:
                 query={'actor': username, 'repository': repository['name']})
 
             self.github_repository_dao.update(repository['_id'], {'commits': github_repository_commits})
-            logger.info(f'Harvested {repository["name"]} - {len(github_repository_commits)} commits for {username}')
+            logger.info(
+                f'Harvester Report: {repository["name"]} - {len(github_repository_commits)} commits for {username}')
+
+    def harvest_commits_for_user_by_missing_push_events(self, username: str):
+        github_commits = self.github_commit_dao.find_all(query={'actor': username})
+        github_commits_by_sha = {commit['sha']: commit for commit in github_commits}
 
         # events
 
@@ -127,16 +137,54 @@ class GithubHarvester:
 
         github_events_by_repository = {}
         for event in github_events:
-            repository = github_events_by_repository.get(event['repo'], [])
+            repository_events = github_events_by_repository.get(event['repo'], {'commits': []})
+
             commit_shas = [url.split('/')[-1] for url in event['commits_url']]
             unique_commits = [commit_sha for commit_sha in commit_shas if commit_sha not in github_commits_by_sha]
-            repository.extend(unique_commits)
-            github_events_by_repository[event['repo']] = repository
+            repository_events['commits'].extend(unique_commits)
+            event_model = {'unique_commits': unique_commits, "commits": repository_events['commits'],
+                           "event_created_at": event['created_at']}
 
-        github_events_by_repository = {key: value for key, value in github_events_by_repository.items() if len(value)}
+            github_events_by_repository[event['repo']] = event_model
 
-        for repository, commit_shas in github_events_by_repository.items():
-            pass
+        github_events_by_repository = {key: value for key, value in github_events_by_repository.items() if
+                                       len(value['unique_commits'])}
+
+        for repository_name, event_model in github_events_by_repository.items():
+            for commit in event_model['unique_commits']:
+                github_commit = GithubCommit(None, None)
+                github_commit.actor = username
+                github_commit.commit_date = event_model['event_created_at']
+                github_commit.repository = repository_name
+                github_commit.sha = commit
+
+                github_commit_id = self.github_commit_dao.create(github_commit)
+                logger.info(
+                    f'Added github commit - {github_commit.actor} - {github_commit.commit_date} - {github_commit.repository} - {github_commit_id}')
+
+            github_repository_results = self.github_repository_dao.find_all(query={'name': repository_name})
+            _github_repository = github_repository_results[0] if len(github_repository_results) else None
+
+            if not _github_repository:
+                _github_repository = GithubRepository(None, None)
+                _github_repository.actor = username
+                _github_repository.name = repository_name
+                _github_repository.display_name = repository_name
+                _github_repository.created_at = event_model['event_created_at']
+                _github_repository.updated_at = event_model['event_created_at']
+
+                self.github_repository_dao.create(_github_repository)
+                logger.info(f'Harvester Report: Created repository {repository_name} for {username}')
+
+                github_repository_results = self.github_repository_dao.find_all(query={'name': repository_name})
+                _github_repository = github_repository_results[0] if len(github_repository_results) else None
+
+            repository_id = github_repository_results[0]['_id']
+            github_repository_commits = self.github_commit_dao.find_all(
+                query={'actor': username, 'repository': repository_name})
+            self.github_repository_dao.update(repository_id, {'commits': github_repository_commits})
+            logger.info(
+                f'Harvester Report: {repository_name} - {len(github_repository_commits)} commits for {username}')
 
         print(github_events_by_repository)
 
