@@ -73,6 +73,49 @@ class GithubHarvester:
 
         return repositories
 
+    def harvest_commits_for_user_by_repositories(self, username: str, *, token: str = None):
+        github_session = build_github_session(username, token) if token else self.github_session
+        github_events = self.github_event_dao.find_all(query={'actor': username})
+
+        github_events_by_repository = {}
+        for event in github_events:
+            repository = github_events_by_repository.get(event['repo'], [])
+            repository.extend(event['commits_url'])
+            github_events_by_repository[event['repo']] = repository
+
+        github_repositories = self.github_repository_dao.find_all(query={'actor': username})
+
+        for repository in github_repositories:
+            commits_url = repository['commits_url'][:-6].replace('git/', '')
+
+            page = 0
+            records = []
+
+            commits = []
+
+            while page == 0 or records:
+                if 'message' in records:
+                    _handle_message(records)
+                    break
+
+                commits.extend(records)
+
+                page = page + 1
+                url = f'{commits_url}?page={page}'
+                records = json.loads(github_session.get(url).text)
+
+            print(records)
+
+        # _repositories = [repository for repository in repositories if
+        #                  repository['full_name'] not in github_repositories_by_name]
+        #
+        # for repository in _repositories:
+        #     github_repository = GithubRepository(repository, github_username)
+        #     self.github_repository_dao.create(github_repository)
+        #     logger.info(f'Added github repository - {github_repository.name}')
+
+        return commits
+
 
 def harvest_session_repositories(username: str, token: str) -> list:
     github_session = build_github_session(username, token)

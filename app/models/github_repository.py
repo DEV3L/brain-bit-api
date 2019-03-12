@@ -11,6 +11,7 @@ class GithubRepository:
         self.labels_url = repo_record['labels_url']
         self.created_at = repo_record['created_at']
         self.updated_at = repo_record['updated_at']
+        self.commits = repo_record.get('commits', [])
 
     def to_json(self):
         return self.__dict__
