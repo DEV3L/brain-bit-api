@@ -63,8 +63,8 @@
             <th>Repository</th>
             <th>Name</th>
             <th>Private</th>
-            <th>Created</th>
             <th>Updated</th>
+            <th>Commits</th>
         </tr>
         </thead>
         <tbody>
@@ -73,8 +73,8 @@
                 <td>{{ github_repository['display_name'] }}</td>
                 <td>{{ github_repository['name'] }}</td>
                 <td>{{ github_repository['private'] }}</td>
-                <td>{{ github_repository['created_at'][0:10] }}</td>
                 <td>{{ github_repository['updated_at'][0:10] }}</td>
+                <td>{{ github_repository['commits_count'] }}</td>
             </tr>
         {% endfor %}
         </tbody>

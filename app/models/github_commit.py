@@ -1,7 +1,7 @@
 class GithubCommit:
     def __init__(self, commit_record: dict, repository_name):
         # TODO: abstract build method
-        self.repository = commit_record[repository_name]
+        self.repository = repository_name
         self.commit_date = commit_record['commit']['author']['date']
         self.actor = commit_record['author']['login']
         self.sha = commit_record['sha']

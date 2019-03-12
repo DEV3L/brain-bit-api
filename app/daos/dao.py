@@ -26,7 +26,11 @@ class Dao:
         return self._to_json(object_record)
 
     def update(self, object_id: str, object_model: object) -> dict:
-        json = object_model.to_json()
+        try:
+            json = object_model.to_json()
+        except AttributeError:
+            json = object_model
+
         return self._mongo_database.mongo_db[self.collection].update_one({'_id': ObjectId(object_id)}, {"$set": json})
 
     def delete_one(self, object_id: str) -> str:

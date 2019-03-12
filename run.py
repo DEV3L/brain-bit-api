@@ -4,6 +4,7 @@ from eve import Eve
 from flask import render_template, request, jsonify
 
 from app.authentication.basic_authentication import requires_auth
+from app.daos.github_commit_dao import GithubCommitDao
 from app.daos.github_event_dao import GithubEventDao
 from app.daos.github_repository_dao import GithubRepositoryDao
 from app.daos.mongo import MongoDatabase
@@ -25,11 +26,12 @@ app = Eve(template_folder=template_dir,
           static_folder=static_dir)
 
 # DAOs
+github_commit_dao = GithubCommitDao(MongoDatabase())
 github_event_dao = GithubEventDao(MongoDatabase())
 github_repository_dao = GithubRepositoryDao(MongoDatabase())
 
 # Harvesters
-github_harvester = GithubHarvester(github_event_dao, github_repository_dao)
+github_harvester = GithubHarvester(github_event_dao, github_repository_dao, github_commit_dao)
 
 
 @app.route('/harvest-github', methods=['POST'])
@@ -51,8 +53,23 @@ def github_repositories():
     github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
 
     repositories_to_display = github_repository_dao.find_all(query={'actor': github_user})
+    repositories_to_display = [_transform_repository(github_repository) for github_repository in
+                               repositories_to_display]
+    repositories_to_display = [github_repository for github_repository in repositories_to_display if
+                               github_repository['commits_count']]
+
+    commits_count = 0
+    for repository in repositories_to_display:
+        commits_count += repository['commits_count']
+
     return render_template('github_repositories.html', github_repositories=repositories_to_display,
-                           repositories_count=len(repositories_to_display), github_user=github_user)
+                           repositories_count=len(repositories_to_display), commits_count=commits_count,
+                           github_user=github_user)
+
+
+def _transform_repository(github_repository):
+    github_repository['commits_count'] = len(github_repository['commits'])
+    return github_repository
 
 
 @app.route('/dashboard', methods=['GET'])
