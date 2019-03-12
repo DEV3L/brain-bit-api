@@ -5,8 +5,9 @@ from flask import render_template, request, jsonify
 
 from app.authentication.basic_authentication import requires_auth
 from app.daos.github_event_dao import GithubEventDao
+from app.daos.github_repository_dao import GithubRepositoryDao
 from app.daos.mongo import MongoDatabase
-from app.harvesters.github_harvester import GithubHarvester, build_github_session
+from app.harvesters.github_harvester import GithubHarvester
 from app.models.github_event import GithubEvent
 from app.services.logging_service import LoggingService
 from app.services.run_service import get_json_data
@@ -26,24 +27,38 @@ app = Eve(template_folder=template_dir,
 
 # DAOs
 github_event_dao = GithubEventDao(MongoDatabase())
+github_repository_dao = GithubRepositoryDao(MongoDatabase())
 
 # Harvesters
-github_harvester = GithubHarvester(GithubEventDao(MongoDatabase()))
+github_harvester = GithubHarvester(github_event_dao, github_repository_dao)
 
 
-@app.route('/harvest-github-events', methods=['POST'])
+@app.route('/harvest-github', methods=['POST'])
 @requires_auth
 def harvest_github_events():
     parameters = get_json_data(request.get_json(), ('github_username',))
 
     github_username = parameters['github_username']
+    github_token = parameters.get('github_token', None)
 
-    _github_harvester = github_harvester
-    if 'github_token' in parameters:
-        _github_harvester = GithubHarvester(GithubEventDao(MongoDatabase()))
-        _github_harvester.github_session = build_github_session(github_username, parameters['github_token'])
+    github_harvester.harvest_events_for_username(github_username, token=github_token)
+    github_harvester.harvest_repositories_for_user(github_username, token=github_token)
 
-    return jsonify(_github_harvester.harvest_events_for_user(github_username))
+    return jsonify({'success': True})
+
+
+@app.route('/github-repositories', methods=['GET'])
+def github_repositories():
+    github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
+
+    events_to_display = github_repository_dao.find_all()
+    events_to_display = [_transform_event(github_event) for github_event in events_to_display]
+
+    repos_to_display_dict, commits_count = _build_repos(events_to_display)
+
+    return render_template('index.html', github_events=events_to_display,
+                           github_repos=repos_to_display_dict.values(),
+                           commits_count=commits_count, github_user=github_user)
 
 
 @app.route('/dashboard', methods=['GET'])
@@ -92,8 +107,6 @@ def _build_repos(events):
         repos_to_display_dict[repo_name] = repo
 
     return repos_to_display_dict, commits_count
-
-
 
 
 if __name__ == '__main__':

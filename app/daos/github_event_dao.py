@@ -1,4 +1,5 @@
 from app.daos.dao import Dao
+from app.daos.mongo import MongoDatabase
 from app.models.github_event import GithubEvent
 
 
