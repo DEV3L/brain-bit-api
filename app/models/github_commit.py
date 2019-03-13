@@ -13,7 +13,7 @@ class GithubCommit:
         # TODO: abstract build method
         self.repository = repository_name
         self.commit_date = commit_record['commit']['author']['date']
-        self.actor = commit_record['author']['login']
+        self.actor = commit_record['commit']['author']['name']
         self.sha = commit_record['sha']
         self.message = commit_record['commit']['message']
         self.html_url = commit_record['html_url']

@@ -57,7 +57,7 @@ class GithubHarvester:
                 f'Added github event for {github_event.actor} - {github_event.created_at} - {github_event_record}')
 
     def harvest_repositories_for_user(self, github_username: str, *, token: str = None):
-        github_repositories = self.github_repository_dao.find_all()
+        github_repositories = self.github_repository_dao.find_all(query={'actor': github_username})
         github_repositories_by_name = {github_repository['name']: github_repository for github_repository in
                                        github_repositories}
 
@@ -102,8 +102,9 @@ class GithubHarvester:
                     break
 
                 _commits = [commit for commit in records if commit['sha'] not in github_commits_by_sha]
+                _commits = [commit for commit in _commits if commit['commit']['author']['name'] == username]
 
-                if page > 0 and not _commits:
+                if page > 0 and not records:
                     break
 
                 commits.extend(records)
@@ -112,9 +113,7 @@ class GithubHarvester:
                 url = f'{commits_url}?page={page}'
                 records = json.loads(github_session.get(url).text)
 
-            github_username_commits = [commit for commit in commits if commit['commit']['author']['name'] == username]
-            _commits = [commit for commit in github_username_commits if commit['sha'] not in github_commits_by_sha]
-            for commit in _commits:
+            for commit in commits:
                 github_commit = GithubCommit(commit, repository['name'])
                 github_commit_id = self.github_commit_dao.create(github_commit)
                 logger.info(
