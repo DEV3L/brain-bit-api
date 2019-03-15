@@ -32,11 +32,11 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="/github-repositories?actor={{ github_user }}">GitHub Repositories</a>
-            </li>
             <li class="nav-item font-weight-bold">
                 <a class="nav-link" href="/github-commits?actor={{ github_user }}">GitHub Commits</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/github-repositories?actor={{ github_user }}">GitHub Repositories</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/github-events?actor={{ github_user }}">GitHub Events</a>
@@ -51,9 +51,12 @@
 <!-- Content -->
 <div class="mx-5 row">
     <h3>Github Commits</h3>
+    <h5 class="ml-2">
+        <small>({{ commits_count_total }})</small>
+    </h5>
 </div>
 <div class="mx-5 row">
-    <p class="mb-0">Total Commits: {{ commits_count }} / Filtered Commits: {{ commits_count_total }}</p>
+    <p class="mb-0">Results: {{ commits_count }}</p>
 </div>
 
 <hr class="my-2 mx-5 p-0"/>
@@ -61,19 +64,23 @@
 <div class="mx-5 mb-2 row">
     <div class="col-6">
         <input class="form-control" placeholder="Repository" name="repository-name" id="repository-name"
-               value="{{ repository_name }}" type="text"/>
+               value="{{ repository_name }}" type="text" onchange="filterCommits()"/>
     </div>
     <div class="col">
         <input class="form-control datepicker" placeholder="Start" name="start-date" id="start-date"
-               value="{{ start_date }}" data-date-format="mm/dd/yyyy"/>
+               value="{{ start_date }}" data-date-format="mm/dd/yyyy" onchange="filterCommits()"/>
     </div>
     <div class="col">
         <input class="form-control datepicker" placeholder="Stop" name="stop-date" id="stop-date"
-               value="{{ stop_date }}" data-date-format="mm/dd/yyyy"/>
+               value="{{ stop_date }}" data-date-format="mm/dd/yyyy" onchange="filterCommits()"/>
     </div>
 </div>
 
-<div id="chartContainer" style="height: 300px; width: 90%;"></div>
+<script>
+
+</script>
+
+<div class="ml-auto mr-auto mb-3" id="chartContainer" style="height: 200px; width: 90%;"></div>
 
 <div class="mx-5 row">
     <table class="table table-striped table-sm w-100">
@@ -91,7 +98,7 @@
             <tr>
                 <td nowrap="nowrap">{{ github_repository['date_display'] }}</td>
                 <td nowrap="nowrap">{{ github_repository['repository'] }}</td>
-                <td>{{ github_repository['message'] }}</td>
+                <td>{{ github_repository['message_display'] }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -137,12 +144,9 @@
                 verticalAlign: "bottom",
                 horizontalAlign: "left",
                 dockInsidePlotArea: true,
-                itemclick: toogleDataSeries
             },
             data: [{
                 type: "line",
-                showInLegend: true,
-                name: "Total Visit",
                 markerType: "square",
                 xValueFormatString: "DD MMM, YYYY",
                 color: "#F08080",
@@ -155,16 +159,19 @@
         });
         chart.render();
 
-        function toogleDataSeries(e) {
-            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-                e.dataSeries.visible = false;
-            } else {
-                e.dataSeries.visible = true;
-            }
-            chart.render();
-        }
+        $('.form-control').change = filterCommits
+    });
 
-    })
+    function filterCommits() {
+        var repositoryName = $('#repository-name').val();
+        var startDate = $('#start-date').val();
+        var stopDate = $('#stop-date').val();
+
+        var location = "/github-commits?actor={{ github_user }}&repository-name=" + repositoryName +
+            "&start-date=" + startDate + "&stop-date=" + stopDate;
+
+        window.location = location;
+    }
 </script>
 
 </body>

@@ -35,6 +35,8 @@ github_repository_dao = GithubRepositoryDao(MongoDatabase())
 # Harvesters
 github_harvester = GithubHarvester(github_event_dao, github_repository_dao, github_commit_dao)
 
+DATE_FORMAT = "%m/%d/%Y"
+
 
 @app.route('/harvest-github', methods=['POST'])
 @requires_auth
@@ -79,13 +81,12 @@ def _transform_repository(github_repository):
 
 @app.route('/github-commits', methods=['GET'])
 def github_commits():
-    DATE_FORMAT = "%m/%d/%Y"
     current_datetime = datetime.now()
     start_date_default = datetime.strftime(current_datetime - relativedelta(months=3), DATE_FORMAT)
     stop_date_default = datetime.strftime(current_datetime, DATE_FORMAT)
 
     github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
-    repository_name = request.values.get('repository-name')
+    repository_name = request.values.get('repository-name', '')
     start_date = request.values.get('start-date', start_date_default)
     stop_date = request.values.get('stop-date', stop_date_default)
 
@@ -106,6 +107,7 @@ def github_commits():
     if repository_name:
         commits_to_display = [commit for commit in commits_to_display if repository_name in commit['repository']]
 
+    commits_to_display = [commit for commit in commits_to_display if commit['message']]
     commits_to_display = [commit for commit in commits_to_display if
                           start <= commit['date']]
     commits_to_display = [commit for commit in commits_to_display if
@@ -130,6 +132,10 @@ def _transform_commits(github_commit):
     date = github_commit['commit_date'].split('T')[0]
     github_commit['date_display'] = date
     github_commit['date'] = datetime.strptime(date, "%Y-%m-%d")
+
+    message = github_commit['message'].split('\n')[0]
+    message = message[:60 if len(message) > 60 else len(message)]
+    github_commit['message_display'] = message
 
     return github_commit
 
