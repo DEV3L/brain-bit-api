@@ -107,7 +107,7 @@ class GithubHarvester:
                 if page > 0 and not records:
                     break
 
-                commits.extend(records)
+                commits.extend(_commits)
 
                 page = page + 1
                 url = f'{commits_url}?page={page}'
