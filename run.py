@@ -79,31 +79,59 @@ def _transform_repository(github_repository):
 
 @app.route('/github-commits', methods=['GET'])
 def github_commits():
+    DATE_FORMAT = "%m/%d/%Y"
     current_datetime = datetime.now()
-    start_date_default = datetime.strftime(current_datetime, "MM/DD/YYYY")
-    stop_date_default = datetime.strftime(current_datetime - relativedelta(years=1), "MM/DD/YYYY")
+    start_date_default = datetime.strftime(current_datetime - relativedelta(months=3), DATE_FORMAT)
+    stop_date_default = datetime.strftime(current_datetime, DATE_FORMAT)
 
     github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
     repository_name = request.values.get('repository-name')
     start_date = request.values.get('start-date', start_date_default)
     stop_date = request.values.get('stop-date', stop_date_default)
 
+    start = datetime.strptime(start_date, DATE_FORMAT)
+    stop = datetime.strptime(stop_date, DATE_FORMAT)
+
+    days_range = []
+    range_date = start
+    while range_date < stop:
+        range_date = range_date + relativedelta(days=1)
+        days_range.append(datetime.strftime(range_date, DATE_FORMAT))
+
     commits_to_display = github_commit_dao.find_all(query={'actor': github_user})
+    commits_to_display = [_transform_commits(github_commit) for github_commit in commits_to_display]
+
     commits_count_total = len(commits_to_display)
 
     if repository_name:
         commits_to_display = [commit for commit in commits_to_display if repository_name in commit['repository']]
 
-    if start_date:
-        pass
+    commits_to_display = [commit for commit in commits_to_display if
+                          start <= commit['date']]
+    commits_to_display = [commit for commit in commits_to_display if
+                          stop >= commit['date']]
 
-    if stop_date:
-        pass
+    grid_data = []
+    for day in days_range:
+        day_date = datetime.strptime(day, DATE_FORMAT)
+
+        day_commits = len([commit for commit in commits_to_display if day_date == commit['date']])
+        data = {'x': f' new Date({day_date.year}, {day_date.month - 1}, {day_date.day}) ', 'y': day_commits}
+
+        grid_data.append(data)
 
     return render_template('github_commits.html', github_commits=commits_to_display,
-                           commits_count=len(commits_to_display),
+                           commits_count=len(commits_to_display), grid_data=grid_data,
                            commits_count_total=commits_count_total, github_user=github_user,
                            start_date=start_date, stop_date=stop_date, repository_name=repository_name)
+
+
+def _transform_commits(github_commit):
+    date = github_commit['commit_date'].split('T')[0]
+    github_commit['date_display'] = date
+    github_commit['date'] = datetime.strptime(date, "%Y-%m-%d")
+
+    return github_commit
 
 
 @app.route('/github-events', methods=['GET'])
