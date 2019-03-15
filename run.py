@@ -1,5 +1,7 @@
 import os
+from datetime import datetime
 
+from dateutil.relativedelta import relativedelta
 from eve import Eve
 from flask import render_template, request, jsonify
 
@@ -50,6 +52,7 @@ def harvest_github_events():
     return jsonify({'success': True})
 
 
+@app.route('/dashboard', methods=['GET'])
 @app.route('/github-repositories', methods=['GET'])
 def github_repositories():
     github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
@@ -74,19 +77,48 @@ def _transform_repository(github_repository):
     return github_repository
 
 
-@app.route('/dashboard', methods=['GET'])
+@app.route('/github-commits', methods=['GET'])
+def github_commits():
+    current_datetime = datetime.now()
+    start_date_default = datetime.strftime(current_datetime, "MM/DD/YYYY")
+    stop_date_default = datetime.strftime(current_datetime - relativedelta(years=1), "MM/DD/YYYY")
+
+    github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
+    repository_name = request.values.get('repository-name')
+    start_date = request.values.get('start-date', start_date_default)
+    stop_date = request.values.get('stop-date', stop_date_default)
+
+    commits_to_display = github_commit_dao.find_all(query={'actor': github_user})
+    commits_count_total = len(commits_to_display)
+
+    if repository_name:
+        commits_to_display = [commit for commit in commits_to_display if repository_name in commit['repository']]
+
+    if start_date:
+        pass
+
+    if stop_date:
+        pass
+
+    return render_template('github_commits.html', github_commits=commits_to_display,
+                           commits_count=len(commits_to_display),
+                           commits_count_total=commits_count_total, github_user=github_user,
+                           start_date=start_date, stop_date=stop_date, repository_name=repository_name)
+
+
+@app.route('/github-events', methods=['GET'])
 def github_events():
-    return _github_dashboard(request)
+    return _github_events(request)
 
 
 @app.route("/github_events/<github_event_id>/delete")
 def github_event_id_delete(github_event_id):
     github_event_dao.delete_one(github_event_id)
 
-    return _github_dashboard(request)
+    return _github_events(request)
 
 
-def _github_dashboard(controller_request):
+def _github_events(controller_request):
     github_user = controller_request.values.get('actor', os.environ['GITHUB_USERNAME'])
 
     events_to_display = github_event_dao.find_all(query={'actor': github_user, 'type': 'PushEvent'})
@@ -94,7 +126,8 @@ def _github_dashboard(controller_request):
 
     repos_to_display_dict, commits_count = _build_repositories(events_to_display)
 
-    return render_template('index.html', github_events=events_to_display, github_repos=repos_to_display_dict.values(),
+    return render_template('github_events.html', github_events=events_to_display,
+                           github_repos=repos_to_display_dict.values(),
                            commits_count=commits_count, github_user=github_user)
 
 

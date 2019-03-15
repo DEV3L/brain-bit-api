@@ -3,6 +3,7 @@ environs
 eve
 Flask
 pymongo
+python-dateutil
 requests
 
 
