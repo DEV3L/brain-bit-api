@@ -5,6 +5,7 @@ Flask
 pymongo
 python-dateutil
 requests
+tweepy
 
 
 # non-functional

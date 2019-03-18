@@ -1,65 +1,27 @@
-from datetime import datetime
-
-from app.twitter_learning_journal.cachers.cache_loader import CacheLoader
-from app.twitter_learning_journal.cachers.tweet_cacher import TweetCacher
-from app.twitter_learning_journal.models.tweet import Tweet
-from app.twitter_learning_journal.models.tweet_raw_data import TweetRawData
-from app.twitter_learning_journal.services.pickle_service import serialize
 from tweepy import API
 from tweepy import Cursor
 
 
 class Tweets:
-    def __init__(self, twitter_api: API, screen_name: str, *, tweet_type: str = 'favorite'):
+    def __init__(self, twitter_api: API, screen_name: str, tweets_by_id: dict, *, tweet_type: str = 'favorite'):
         self.tweet_type = tweet_type
         self.screen_name = screen_name
+        self.tweets_by_id = tweets_by_id
 
         self._twitter_api = twitter_api
         self._twitter_api_type = twitter_api.favorites if 'favorite' == tweet_type else twitter_api.user_timeline
-        self._cached_tweets = None
-        self._realtime_rate_in_hours = 24
-
-    @property
-    def cached_tweets(self):
-        if self._cached_tweets is not None:
-            return self._cached_tweets
-
-        tweet_cache_loader = CacheLoader(self.screen_name)
-        self._cached_tweets = tweet_cache_loader.load_cached_entities()
-
-        return self._cached_tweets
 
     def get(self):
-        tweets = []
-
-        if self.has_new_tweets():
-            self._get_from_twitter(tweets)
-
-        tweets.extend(self.cached_tweets)
+        tweets = self._get_from_twitter()
         return tweets
 
-    def has_new_tweets(self):
-        if not self.cached_tweets:
-            return True
-
-        _cached_tweets = list(self.cached_tweets)
-        _cached_tweets.sort(key=lambda tweet: tweet.created_at, reverse=True)
-
-        most_recent_tweet = _cached_tweets[0]
-        seconds_since_last_cached_tweet = (datetime.now() - most_recent_tweet.created_at).seconds
-        hours_since_last_cached_tweet = (seconds_since_last_cached_tweet / 60) / 60
-
-        return hours_since_last_cached_tweet > self._realtime_rate_in_hours
-
-    def _get_from_twitter(self, tweets: list):
+    def _get_from_twitter(self):
+        retrieved_tweets = []
         for call_response in self._call():
             tweet_model = self._get_tweet(call_response)
+            retrieved_tweets.append(tweet_model)
 
-            if tweet_model in self.cached_tweets:
-                break
-
-            TweetCacher(self.screen_name, tweet_model).cache()
-            tweets.append(tweet_model)
+        return retrieved_tweets
 
     def _call(self):
         yield from Cursor(self._twitter_api_type, self.screen_name, tweet_mode='extended', count=50).items()
@@ -67,22 +29,23 @@ class Tweets:
     def _get_tweet(self, call_response):
         full_text = self.extract_full_text(call_response)
         urls = self.extract_urls(call_response)
-
-        tweet_model = Tweet(
-            screen_name=self.screen_name,
-            id=call_response.id,
-            created_at=call_response.created_at,
-            full_text=full_text,
-            hashtags=self.extract_hashtags(call_response),
-            urls='|'.join(urls),
-            type=self.tweet_type,
-        )
-
-        pickled_response = serialize(call_response)
-        raw_data = TweetRawData(tweet=tweet_model, raw_data=pickled_response)
-
-        tweet_model.tweet_raw_data.append(raw_data)
-        return tweet_model
+        #
+        # tweet_model = Tweet(
+        #     screen_name=self.screen_name,
+        #     id=call_response.id,
+        #     created_at=call_response.created_at,
+        #     full_text=full_text,
+        #     hashtags=self.extract_hashtags(call_response),
+        #     urls='|'.join(urls),
+        #     type=self.tweet_type,
+        # )
+        #
+        # pickled_response = serialize(call_response)
+        # raw_data = TweetRawData(tweet=tweet_model, raw_data=pickled_response)
+        #
+        # tweet_model.tweet_raw_data.append(raw_data)
+        # return tweet_model
+        return {'full_text': full_text, 'urls': urls}
 
     @staticmethod
     def extract_full_text(call_response):
