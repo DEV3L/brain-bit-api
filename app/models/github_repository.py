@@ -1,4 +1,7 @@
-class GithubRepository:
+from app.models.model import Model
+
+
+class GithubRepository(Model):
     def __init__(self, repo_record: dict, actor: str):
         if not repo_record:
             self.actor = ''
@@ -27,6 +30,3 @@ class GithubRepository:
         self.created_at = repo_record['created_at']
         self.updated_at = repo_record['updated_at']
         self.commits = repo_record.get('commits', [])
-
-    def to_json(self):
-        return self.__dict__

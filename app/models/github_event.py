@@ -1,4 +1,7 @@
-class GithubEvent:
+from app.models.model import Model
+
+
+class GithubEvent(Model):
     def __init__(self, event_record: dict):
         self.id = event_record['id']
         self.type = event_record['type']
@@ -12,6 +15,3 @@ class GithubEvent:
         self.commits_url = [commit['url'] for commit in event_record['payload']['commits']] if 'commits' in \
                                                                                                event_record[
                                                                                                    'payload'] else []
-
-    def to_json(self):
-        return self.__dict__

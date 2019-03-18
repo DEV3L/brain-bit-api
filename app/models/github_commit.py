@@ -1,4 +1,7 @@
-class GithubCommit:
+from app.models.model import Model
+
+
+class GithubCommit(Model):
     def __init__(self, commit_record: dict, repository_name):
         if not commit_record:
             self.repository = ''
@@ -17,6 +20,3 @@ class GithubCommit:
         self.sha = commit_record['sha']
         self.message = commit_record['commit']['message']
         self.html_url = commit_record['html_url']
-
-    def to_json(self):
-        return self.__dict__

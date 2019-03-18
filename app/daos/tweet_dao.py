@@ -6,12 +6,12 @@ class TweetDao(Dao):
     def __init__(self, mongo_database):
         super().__init__(mongo_database, 'tweets')
 
-    def _to_json(self, object_record: dict) -> GithubEvent:
-        tweet_model = Tweet(object_record)
+    def _to_json(self, object_record: dict) -> Tweet:
+        tweet_model = Tweet(object_record['name'])
         return tweet_model
 
     def find_by_id(self, tweet_id):
-        json = self._mongo_database.get(self._collection, tweet_id)
-        tweet_model = Tweet(None, None, None, None)
+        json = self._mongo_database.get(self.collection, tweet_id)
+        tweet_model = Tweet('')
         tweet_model.from_json(json)
         return tweet_model
