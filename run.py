@@ -54,19 +54,6 @@ def harvest_github():
     return jsonify({'success': True})
 
 
-@app.route('/mine-github', methods=['POST'])
-def mine_github():
-    github_username = request.form['github_username']
-    github_token = request.form['github_token']
-
-    github_harvester.harvest_events_for_username(github_username, token=github_token)
-    github_harvester.harvest_repositories_for_user(github_username, token=github_token)
-    github_harvester.harvest_commits_for_user_by_repositories(github_username, token=github_token)
-    github_harvester.harvest_commits_for_user_by_missing_push_events(github_username)
-
-    return jsonify({'success': True})
-
-
 @app.route('/github-repositories', methods=['GET'])
 def github_repositories():
     github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
@@ -91,14 +78,31 @@ def _transform_repository(github_repository):
     return github_repository
 
 
+@app.route('/mine-github', methods=['POST'])
+def mine_github():
+    github_username = request.form['github-username']
+    github_token = request.form['github-token']
+
+    github_harvester.harvest_events_for_username(github_username, token=github_token)
+    github_harvester.harvest_repositories_for_user(github_username, token=github_token)
+    github_harvester.harvest_commits_for_user_by_repositories(github_username, token=github_token)
+    github_harvester.harvest_commits_for_user_by_missing_push_events(github_username)
+
+    return _github_commits(github_username)
+
+
 @app.route('/dashboard', methods=['GET'])
 @app.route('/github-commits', methods=['GET'])
 def github_commits():
+    return _github_commits()
+
+
+def _github_commits(actor: str = os.environ['GITHUB_USERNAME']):
     current_datetime = datetime.now()
     start_date_default = datetime.strftime(current_datetime - relativedelta(months=3), DATE_FORMAT)
     stop_date_default = datetime.strftime(current_datetime, DATE_FORMAT)
 
-    github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
+    github_user = request.values.get('actor', actor)
     repository_name = request.values.get('repository-name', '')
     start_date = request.values.get('start-date', start_date_default)
     stop_date = request.values.get('stop-date', stop_date_default)

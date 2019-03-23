@@ -75,11 +75,11 @@
                     </div>
                     <hr class="my-0 pt-0 pb-2"/>
                     <div class="form-group">
-                        <input type="text" class="form-control" id="github_username" name="github_username"
+                        <input type="text" class="form-control" id="github-username" name="github-username"
                                value="{{ github_user }}" placeholder="Github Username"/>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" id="github_token" name="github_token"
+                        <input type="text" class="form-control" id="github-token" name="github-token"
                                placeholder="Github Access Token"/>
                     </div>
                     <div class="mx-1 p-2 modal-footer">
@@ -110,9 +110,10 @@
         }
 
         $(document).ready(function () {
+            var githubUsername = $('#github-username').val();
             $("#mine-github-form").submit(function (event) {
                 setTimeout(function () {
-                    window.location = "/github-commits"
+                    window.location = "/github-commits?actor=" + githubUsername
                 }, 5000);
 
                 $("#mine-github-form").hide();
