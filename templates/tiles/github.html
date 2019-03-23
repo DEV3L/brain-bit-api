@@ -42,7 +42,10 @@
                    href="/github-events?actor={{ github_user }}">GitHub Events</a>
             </li>
         </ul>
-        <h5 class="my-0 mr-5 ml-auto font-weight-normal">
+
+        <button class="mr-1 ml-auto btn btn-outline-secondary" onclick="githubHarvestModal()">Mine Github</button>
+
+        <h5 class="my-0 mr-4 ml-4 font-weight-normal">
             <small class="mr-2 font-italic">Github Account:</small>
             {{ github_user }}</h5>
     </div>
@@ -53,14 +56,72 @@
     {% block content %}{% endblock %}
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="github-harvest-modal" role="dialog">
+    <div class="modal-dialog">
+        <div id="tiles-model-content" class="modal-content">
+            <div class="mx-2 p-1 modal-body">
+                <form id="mine-github-form" action="/mine-github" method="post">
+                    <div class="mx-1 row">
+                        <h3 class="mt-2 mb-0" id="filter-name-modal">Mine GitHub User Information</h3>
+                        <button type="button" class="ml-auto close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="mx-1 row">
+                        <small><p class="my-0 text-muted" id="filter-label-modal">Generate a READONLY User Access Token
+                            For
+                            <a target="_blank"
+                               href="https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line">GitHub</a>
+                        </p></small>
+                    </div>
+                    <hr class="my-0 pt-0 pb-2"/>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="github_username" name="github_username"
+                               value="{{ github_user }}" placeholder="Github Username"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="github_token" name="github_token"
+                               placeholder="Github Access Token"/>
+                    </div>
+                    <div class="mx-1 p-2 modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
 
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
-<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+                <div style="display:none" id="loading-icon" class="text-center">
+                    <img style="height: 250px" src="{{ url_for('static', filename='images/jar-loading.gif') }}"/>
+                </div>
+            </div>
+        </div>
+    </div>
 
-{% block javascript %}{% endblock %}
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+    {% block javascript %}{% endblock %}
+
+
+    <script>
+        function githubHarvestModal() {
+            $("#github-harvest-modal").modal();
+        }
+
+        $(document).ready(function () {
+            $("#mine-github-form").submit(function (event) {
+                setTimeout(function () {
+                    window.location = "/github-commits"
+                }, 5000);
+
+                $("#mine-github-form").hide();
+                $("#loading-icon").show();
+                $("#mine-github-form").submit();
+            });
+        })
+    </script>
+
 
 </body>
 

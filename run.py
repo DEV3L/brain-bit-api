@@ -40,7 +40,7 @@ DATE_FORMAT = "%m/%d/%Y"
 
 @app.route('/harvest-github', methods=['POST'])
 @requires_auth
-def harvest_github_events():
+def harvest_github():
     parameters = get_json_data(request.get_json(), ('github_username',))
 
     github_username = parameters['github_username']
@@ -52,6 +52,20 @@ def harvest_github_events():
     github_harvester.harvest_commits_for_user_by_missing_push_events(github_username)
 
     return jsonify({'success': True})
+
+
+@app.route('/mine-github', methods=['POST'])
+def mine_github():
+    github_username = request.form['github_username']
+    github_token = request.form['github_token']
+
+    github_harvester.harvest_events_for_username(github_username, token=github_token)
+    github_harvester.harvest_repositories_for_user(github_username, token=github_token)
+    github_harvester.harvest_commits_for_user_by_repositories(github_username, token=github_token)
+    github_harvester.harvest_commits_for_user_by_missing_push_events(github_username)
+
+    return jsonify({'success': True})
+
 
 
 @app.route('/github-repositories', methods=['GET'])
