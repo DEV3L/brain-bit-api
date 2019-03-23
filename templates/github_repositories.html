@@ -1,46 +1,45 @@
-
 {% extends "tiles/github.html" %}
 
 {% block title %}Github Repositories{% endblock %}
 
 {% block content %}
-<div class="mx-5 row">
-    <h3>Github Repositories</h3>
-</div>
-<div class="mx-5 row">
-    <p class="mb-0">Repositories: {{ repositories_count }} / Commits: {{ commits_count }}</p>
-</div>
+    <div class="mx-5 row">
+        <h3>Github Repositories</h3>
+    </div>
+    <div class="mx-5 row">
+        <p class="mb-0">Repositories: {{ repositories_count }} / Commits: {{ commits_count }}</p>
+    </div>
 
-<hr class="my-2 mx-5 p-0"/>
+    <hr class="my-2 mx-5 p-0"/>
 
-<div class="mx-5 row">
-    <h4>Repositories
-        <small>({{ repositories_count }})</small>
-    </h4>
+    <div class="mx-5 row">
+        <h4>Repositories
+            <small>({{ repositories_count }})</small>
+        </h4>
 
-    <table class="table table-striped table-sm w-100">
-        <thead>
-        <tr>
-            <th>Repository</th>
-            <th>Name</th>
-            <th>Private</th>
-            <th>Updated</th>
-            <th>Commits</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for github_repository in github_repositories %}
+        <table class="table table-striped table-sm w-100">
+            <thead>
             <tr>
-                <td>{{ github_repository['display_name'] }}</td>
-                <td>{{ github_repository['name'] }}</td>
-                <td>{{ github_repository['private'] }}</td>
-                <td nowrap="nowrap">{{ github_repository['updated_at'][0:10] }}</td>
-                <td>{{ github_repository['commits_count'] }}</td>
+                <th>Repository</th>
+                <th>Name</th>
+                <th>Private</th>
+                <th>Updated</th>
+                <th>Commits</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+            {% for github_repository in github_repositories %}
+                <tr>
+                    <td>{{ github_repository['display_name'] }}</td>
+                    <td>{{ github_repository['name'] }}</td>
+                    <td>{{ github_repository['private'] }}</td>
+                    <td nowrap="nowrap">{{ github_repository['updated_at'][0:10] }}</td>
+                    <td>{{ github_repository['commits_count'] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 {% endblock %}
 

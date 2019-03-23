@@ -67,7 +67,6 @@ def mine_github():
     return jsonify({'success': True})
 
 
-
 @app.route('/github-repositories', methods=['GET'])
 def github_repositories():
     github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
