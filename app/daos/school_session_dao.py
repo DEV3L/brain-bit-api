@@ -5,7 +5,7 @@ from app.daos.mongo import MongoDatabase
 from app.models.school_session import SchoolSession
 
 
-class GithubCommitDao(Dao):
+class SchoolSessionDao(Dao):
     def __init__(self, mongo_database: MongoDatabase):
         super().__init__(mongo_database, 'school_sessions')
 
@@ -14,6 +14,11 @@ class GithubCommitDao(Dao):
                    self._mongo_database.find(self.collection, query).sort("date", pymongo.DESCENDING)]
         return results
 
-    def _to_json(self, object_record: dict) -> GithubRepository:
-        school_session = SchoolSession(object_record)
+    def _to_json(self, object_record: dict) -> SchoolSession:
+        school_session = SchoolSession()
+        school_session.build_from_record(object_record)
+
+        github_repository = GithubRepository(repository, github_username)
+        self.github_repository_dao.create(github_repository)
+
         return school_session
