@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from eve import Eve
 from flask import render_template, request, jsonify
@@ -174,7 +175,7 @@ def github_event_id_delete(github_event_id):
 
 
 @app.route('/mine-school', methods=['POST'])
-def mine_github():
+def mine_school():
     github_username = request.form['github-username']
 
     school_harvester.harvest_sessions_for_username(github_username)
@@ -187,7 +188,7 @@ def school_sessions():
     return _school_sessions()
 
 
-def _session_sessions(actor: str = os.environ['GITHUB_USERNAME']):
+def _school_sessions(actor: str = os.environ['GITHUB_USERNAME']):
     current_datetime = datetime.now()
     start_date_default = datetime.strftime(current_datetime - relativedelta(months=3), DATE_FORMAT)
     stop_date_default = datetime.strftime(current_datetime, DATE_FORMAT)
@@ -216,10 +217,10 @@ def _session_sessions(actor: str = os.environ['GITHUB_USERNAME']):
         school_sessions_to_display = [school_session for school_session in school_sessions_to_display if
                                       project in school_session['project']]
 
-    school_sessions_to_display = [commit for commit in school_sessions_to_display if
-                                  start <= commit['date']]
-    school_sessions_to_display = [commit for commit in school_sessions_to_display if
-                                  stop >= commit['date']]
+    school_sessions_to_display = [school_session for school_session in school_sessions_to_display if
+                                  start <= parser.parse(school_session['date'])]
+    school_sessions_to_display = [school_session for school_session in school_sessions_to_display if
+                                  stop >= parser.parse(school_session['date'])]
 
     grid_data = []
     for day in days_range:

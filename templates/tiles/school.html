@@ -23,7 +23,7 @@
 
 <!-- Content Banner -->
 <nav class="mx-2 mt-0 mb-2 pt-1 pb-0 pr-0 pl-2 navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="/dashboard?actor={{ github_user }}">
+    <a class="navbar-brand" href="/school?actor={{ github_user }}">
         <img style="height:45px" class="mb-0 pb-0" src="{{ url_for('static', filename='images/logo.png') }}"/>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
@@ -31,19 +31,12 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item {{ 'font-weight-bold' if request.path == '/github-commits' or request.path == '/mine-github' else '' }}">
-                <a class="nav-link" href="/github-commits?actor={{ github_user }}">GitHub Commits</a>
-            </li>
-            <li class="nav-item {{ 'font-weight-bold' if request.path == '/github-repositories' else '' }}">
-                <a class="nav-link" href="/github-repositories?actor={{ github_user }}">GitHub Repositories</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ 'font-weight-bold' if request.path == '/github-events' else '' }}"
-                   href="/github-events?actor={{ github_user }}">GitHub Events</a>
+            <li class="nav-item {{ 'font-weight-bold' if request.path == '/school-sessions'  else '' }}">
+                <a class="nav-link" href="/school-sessions?actor={{ github_user }}">School Sessions</a>
             </li>
         </ul>
 
-        <button class="mr-1 ml-auto btn btn-outline-secondary" onclick="githubHarvestModal()">Mine Github</button>
+        <button class="mr-1 ml-auto btn btn-outline-secondary" onclick="schoolHarvestModal()">Mine Sessions</button>
 
         <h5 class="my-0 mr-4 ml-4 font-weight-normal">
             <small class="mr-2 font-italic">Actor:</small>
@@ -61,7 +54,7 @@
     <div class="modal-dialog">
         <div id="tiles-model-content" class="modal-content">
             <div class="mx-2 p-1 modal-body">
-                <form id="mine-github-form" action="/mine-github" method="post">
+                <form id="mine-github-form" action="/mine-school" method="post">
                     <div class="mx-1 row">
                         <h3 class="mt-2 mb-0" id="filter-name-modal">Mine GitHub User Information</h3>
                         <button type="button" class="ml-auto close" data-dismiss="modal">&times;</button>
@@ -75,12 +68,8 @@
                     </div>
                     <hr class="my-0 pt-0 pb-2"/>
                     <div class="form-group">
-                        <input type="text" class="form-control" id="github-username" name="github-username"
-                               value="{{ github_user }}" placeholder="Github Username"/>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="github-token" name="github-token"
-                               placeholder="Github Access Token"/>
+                        <input type="text" class="form-control" id="actor" name="actor"
+                               value="{{ github_user }}" placeholder="Actor"/>
                     </div>
                     <div class="mx-1 p-2 modal-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -105,20 +94,20 @@
 
 
     <script>
-        function githubHarvestModal() {
-            $("#github-harvest-modal").modal();
+        function schoolHarvestModal() {
+            $("#school-harvest-modal").modal();
         }
 
         $(document).ready(function () {
-            var githubUsername = $('#github-username').val();
-            $("#mine-github-form").submit(function (event) {
+            var schoolUsername = $('#school-username').val();
+            $("#mine-school-form").submit(function (event) {
                 setTimeout(function () {
-                    window.location = "/github-commits?actor=" + githubUsername
+                    window.location = "/school-commits?actor=" + schoolUsername
                 }, 5000);
 
-                $("#mine-github-form").hide();
+                $("#mine-school-form").hide();
                 $("#loading-icon").show();
-                $("#mine-github-form").submit();
+                $("#mine-school-form").submit();
             });
         })
     </script>
