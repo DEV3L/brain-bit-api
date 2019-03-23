@@ -3,8 +3,8 @@ from app.utils.env import env
 MONGO_URI = env('MONGODB_URI')
 
 IF_MATCH = False
-PAGINATION_LIMIT = 1000
-PAGINATION_DEFAULT = 1000
+PAGINATION_LIMIT = 5000
+PAGINATION_DEFAULT = 5000
 
 # Enable reads (GET), inserts (POST) and DELETE for resources/collections
 # (if you omit this line, the API will default to ['GET'] and provide read-only access to the endpoint).
