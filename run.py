@@ -10,7 +10,9 @@ from app.daos.github_commit_dao import GithubCommitDao
 from app.daos.github_event_dao import GithubEventDao
 from app.daos.github_repository_dao import GithubRepositoryDao
 from app.daos.mongo import MongoDatabase
+from app.daos.school_session_dao import SchoolSessionDao
 from app.harvesters.github_harvester import GithubHarvester
+from app.harvesters.school_harvester import SchoolHarvester
 from app.services.logging_service import LoggingService
 from app.services.run_service import get_json_data
 from app.utils.env import env
@@ -31,9 +33,11 @@ app = Eve(template_folder=template_dir,
 github_commit_dao = GithubCommitDao(MongoDatabase())
 github_event_dao = GithubEventDao(MongoDatabase())
 github_repository_dao = GithubRepositoryDao(MongoDatabase())
+school_session_dao = SchoolSessionDao(MongoDatabase())
 
 # Harvesters
 github_harvester = GithubHarvester(github_event_dao, github_repository_dao, github_commit_dao)
+school_harvester = SchoolHarvester(school_session_dao)
 
 DATE_FORMAT = "%m/%d/%Y"
 
@@ -167,6 +171,75 @@ def github_event_id_delete(github_event_id):
     github_event_dao.delete_one(github_event_id)
 
     return _github_events(request)
+
+
+@app.route('/mine-school', methods=['POST'])
+def mine_github():
+    github_username = request.form['github-username']
+
+    school_harvester.harvest_sessions_for_username(github_username)
+
+    return _github_commits(github_username)
+
+
+@app.route('/school-sessions', methods=['GET'])
+def school_sessions():
+    return _school_sessions()
+
+
+def _session_sessions(actor: str = os.environ['GITHUB_USERNAME']):
+    current_datetime = datetime.now()
+    start_date_default = datetime.strftime(current_datetime - relativedelta(months=3), DATE_FORMAT)
+    stop_date_default = datetime.strftime(current_datetime, DATE_FORMAT)
+
+    github_user = request.values.get('actor', actor)
+    project = request.values.get('project', '')
+    start_date = request.values.get('start-date', start_date_default)
+    stop_date = request.values.get('stop-date', stop_date_default)
+
+    start = datetime.strptime(start_date, DATE_FORMAT)
+    stop = datetime.strptime(stop_date, DATE_FORMAT)
+
+    days_range = []
+    range_date = start
+    while range_date < stop:
+        range_date = range_date + relativedelta(days=1)
+        days_range.append(datetime.strftime(range_date, DATE_FORMAT))
+
+    school_sessions_to_display = school_session_dao.find_all(query={'actor': github_user})
+    school_sessions_to_display = [_transform_school_sessions(school_session) for school_session in
+                                  school_sessions_to_display]
+
+    school_sessions_count_total = len(school_sessions_to_display)
+
+    if project:
+        school_sessions_to_display = [school_session for school_session in school_sessions_to_display if
+                                      project in school_session['project']]
+
+    school_sessions_to_display = [commit for commit in school_sessions_to_display if
+                                  start <= commit['date']]
+    school_sessions_to_display = [commit for commit in school_sessions_to_display if
+                                  stop >= commit['date']]
+
+    grid_data = []
+    for day in days_range:
+        day_date = datetime.strptime(day, DATE_FORMAT)
+
+        # TODO: totals
+        day_school_sessions = len(
+            [school_session for school_session in school_sessions_to_display if day_date == school_session['date']])
+        data = {'x': f' new Date({day_date.year}, {day_date.month - 1}, {day_date.day}) ', 'y': day_school_sessions}
+
+        grid_data.append(data)
+
+    return render_template('school_sessions.html', school_sessions=school_sessions_to_display,
+                           school_sessions_count=len(school_sessions_to_display), grid_data=grid_data,
+                           school_sessions_count_total=school_sessions_count_total, github_user=github_user,
+                           start_date=start_date, stop_date=stop_date, project=project)
+
+
+def _transform_school_sessions(school_session):
+    return school_session
 
 
 def _github_events(controller_request):
