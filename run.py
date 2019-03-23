@@ -54,7 +54,6 @@ def harvest_github_events():
     return jsonify({'success': True})
 
 
-@app.route('/dashboard', methods=['GET'])
 @app.route('/github-repositories', methods=['GET'])
 def github_repositories():
     github_user = request.values.get('actor', os.environ['GITHUB_USERNAME'])
@@ -79,6 +78,7 @@ def _transform_repository(github_repository):
     return github_repository
 
 
+@app.route('/dashboard', methods=['GET'])
 @app.route('/github-commits', methods=['GET'])
 def github_commits():
     current_datetime = datetime.now()

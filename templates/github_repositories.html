@@ -1,52 +1,9 @@
-<!doctype html>
-<html lang="en">
 
-<head>
-    <title>Brain Bit - GitHub Repositories</title>
+{% extends "tiles/github.html" %}
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}"/>
+{% block title %}Github Repositories{% endblock %}
 
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <!-- font-awesome -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
-
-    <!-- Custom styles for this template -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-
-<body>
-
-<!-- Content Banner -->
-<nav class="mx-2 mt-0 mb-2 pt-1 pb-0 pr-0 pl-2 navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="/dashboard?actor={{ github_user }}">
-        <img style="height:45px" class="mb-0 pb-0" src="{{ url_for('static', filename='images/logo.png') }}"/>
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item font-weight-bold">
-                <a class="nav-link" href="/github-repositories?actor={{ github_user }}">GitHub Repositories</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/github-commits?actor={{ github_user }}">GitHub Commits</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/github-events?actor={{ github_user }}">GitHub Events</a>
-            </li>
-        </ul>
-        <h5 class="my-0 mr-5 ml-auto font-weight-normal">
-            <small class="mr-2 font-italic">Github Account:</small>
-            {{ github_user }}</h5>
-    </div>
-</nav>
-
-<!-- Content -->
+{% block content %}
 <div class="mx-5 row">
     <h3>Github Repositories</h3>
 </div>
@@ -77,7 +34,7 @@
                 <td>{{ github_repository['display_name'] }}</td>
                 <td>{{ github_repository['name'] }}</td>
                 <td>{{ github_repository['private'] }}</td>
-                <td>{{ github_repository['updated_at'][0:10] }}</td>
+                <td nowrap="nowrap">{{ github_repository['updated_at'][0:10] }}</td>
                 <td>{{ github_repository['commits_count'] }}</td>
             </tr>
         {% endfor %}
@@ -85,15 +42,6 @@
     </table>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+{% endblock %}
 
-<script>
-    $(document).ready(function () {
-    });
-</script>
-
-</body>
-
-</html>
+{% block javascript %}{% endblock %}
