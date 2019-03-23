@@ -44,11 +44,11 @@
             </thead>
 
             <tbody>
-            {% for github_repository in github_commits %}
+            {% for github_commit in github_commits %}
                 <tr>
-                    <td nowrap="nowrap">{{ github_repository['date_display'] }}</td>
-                    <td nowrap="nowrap">{{ github_repository['repository'] }}</td>
-                    <td>{{ github_repository['message_display'] }}</td>
+                    <td nowrap="nowrap">{{ github_commit['date_display'] }}</td>
+                    <td nowrap="nowrap">{{ github_commit['repository'] }}</td>
+                    <td>{{ github_commit['message_display'] }}</td>
                 </tr>
             {% endfor %}
             </tbody>
