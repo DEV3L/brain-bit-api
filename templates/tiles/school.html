@@ -23,7 +23,7 @@
 
 <!-- Content Banner -->
 <nav class="mx-2 mt-0 mb-2 pt-1 pb-0 pr-0 pl-2 navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="/school?actor={{ github_user }}">
+    <a class="navbar-brand" href="/school?actor={{ actor }}">
         <img style="height:45px" class="mb-0 pb-0" src="{{ url_for('static', filename='images/logo.png') }}"/>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
@@ -32,7 +32,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item {{ 'font-weight-bold' if request.path == '/school-sessions'  else '' }}">
-                <a class="nav-link" href="/school-sessions?actor={{ github_user }}">School Sessions</a>
+                <a class="nav-link" href="/school-sessions?actor={{ actorf }}">School Sessions</a>
             </li>
         </ul>
 
@@ -40,7 +40,7 @@
 
         <h5 class="my-0 mr-4 ml-4 font-weight-normal">
             <small class="mr-2 font-italic">Actor:</small>
-            {{ github_user }}</h5>
+            {{ actor }}</h5>
     </div>
 </nav>
 
@@ -50,26 +50,23 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="github-harvest-modal" role="dialog">
+<div class="modal fade" id="school-harvest-modal" role="dialog">
     <div class="modal-dialog">
         <div id="tiles-model-content" class="modal-content">
             <div class="mx-2 p-1 modal-body">
-                <form id="mine-github-form" action="/mine-school" method="post">
+                <form id="mine-school-session-form" action="/mine-school" method="post">
                     <div class="mx-1 row">
                         <h3 class="mt-2 mb-0" id="filter-name-modal">Mine GitHub User Information</h3>
                         <button type="button" class="ml-auto close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="mx-1 row">
-                        <small><p class="my-0 text-muted" id="filter-label-modal">Generate a READONLY User Access Token
-                            For
-                            <a target="_blank"
-                               href="https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line">GitHub</a>
-                        </p></small>
+                        <small><p class="my-0 text-muted" id="filter-label-modal">Skiplist School 745-9a Daily</p>
+                        </small>
                     </div>
                     <hr class="my-0 pt-0 pb-2"/>
                     <div class="form-group">
                         <input type="text" class="form-control" id="actor" name="actor"
-                               value="{{ github_user }}" placeholder="Actor"/>
+                               value="{{ actor }}" placeholder="Actor"/>
                     </div>
                     <div class="mx-1 p-2 modal-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>

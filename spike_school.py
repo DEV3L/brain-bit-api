@@ -7,4 +7,4 @@ from app.harvesters.school_harvester import SchoolHarvester
 github_username = os.environ['GITHUB_USERNAME']
 
 github_harvester = SchoolHarvester(SchoolSessionDao(MongoDatabase()))
-github_harvester.harvest_sessions_for_username(github_username)
+github_harvester.harvest_sessions_for_actor(github_username)

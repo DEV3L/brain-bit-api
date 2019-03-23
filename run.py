@@ -176,11 +176,11 @@ def github_event_id_delete(github_event_id):
 
 @app.route('/mine-school', methods=['POST'])
 def mine_school():
-    github_username = request.form['github-username']
+    actor = request.form['actor']
 
-    school_harvester.harvest_sessions_for_username(github_username)
+    school_harvester.harvest_sessions_for_actor(actor)
 
-    return _github_commits(github_username)
+    return _school_sessions(actor)
 
 
 @app.route('/school-sessions', methods=['GET'])
@@ -193,7 +193,7 @@ def _school_sessions(actor: str = os.environ['GITHUB_USERNAME']):
     start_date_default = datetime.strftime(current_datetime - relativedelta(months=3), DATE_FORMAT)
     stop_date_default = datetime.strftime(current_datetime, DATE_FORMAT)
 
-    github_user = request.values.get('actor', actor)
+    actor = request.values.get('actor', actor)
     project = request.values.get('project', '')
     start_date = request.values.get('start-date', start_date_default)
     stop_date = request.values.get('stop-date', stop_date_default)
@@ -207,7 +207,7 @@ def _school_sessions(actor: str = os.environ['GITHUB_USERNAME']):
         range_date = range_date + relativedelta(days=1)
         days_range.append(datetime.strftime(range_date, DATE_FORMAT))
 
-    school_sessions_to_display = school_session_dao.find_all(query={'actor': github_user})
+    school_sessions_to_display = school_session_dao.find_all(query={'actor': actor})
     school_sessions_to_display = [_transform_school_sessions(school_session) for school_session in
                                   school_sessions_to_display]
 
@@ -235,7 +235,7 @@ def _school_sessions(actor: str = os.environ['GITHUB_USERNAME']):
 
     return render_template('school_sessions.html', school_sessions=school_sessions_to_display,
                            school_sessions_count=len(school_sessions_to_display), grid_data=grid_data,
-                           school_sessions_count_total=school_sessions_count_total, github_user=github_user,
+                           school_sessions_count_total=school_sessions_count_total, actor=actor,
                            start_date=start_date, stop_date=stop_date, project=project)
 
 

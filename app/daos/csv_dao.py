@@ -13,4 +13,7 @@ def _read_csv_file(file_path: str) -> []:
     with open(file_path, mode="r", encoding='utf-8-sig') as csv_file:
         csv_reader = csv.DictReader(csv_file)
         _file_contents = [row for row in csv_reader]
+        for row in _file_contents:
+            for key, value in row.items():
+                row[key] = value.strip()
         return _file_contents
