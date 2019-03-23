@@ -12,7 +12,7 @@ from app.models.github_event import GithubEvent
 from app.models.github_repository import GithubRepository
 from app.services.logging_service import LoggingService
 
-logger = LoggingService('github_retriever')
+logger = LoggingService('github')
 
 DEFAULT_USERNAME = os.environ['GITHUB_USERNAME']
 DEFAULT_TOKEN = os.environ['GITHUB_TOKEN']
