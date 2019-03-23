@@ -22,6 +22,101 @@ X_DOMAINS = '*'
 X_HEADERS = ['Authorization', 'Content-type']
 X_ALLOW_CREDENTIALS = True
 
+github_commits = {
+    'schema': {
+        'repository': {
+            'type': 'string'
+        },
+        'commit_date': {
+            'type': 'string',
+        },
+        'actor': {
+            'type': 'string',
+        },
+        'sha': {
+            'type': 'string',
+        },
+        'message': {
+            'type': 'string',
+        },
+        'html_url': {
+            'type': 'string',
+        },
+    }
+}
+
+github_events = {
+    'schema': {
+
+        'id': {
+            'type': 'string',
+        },
+        'actor': {
+            'type': 'string',
+        },
+        'type': {
+            'actor': 'string',
+        },
+        'created_at': {
+            'type': 'string',
+        },
+        'repo': {
+            'type': 'string',
+        },
+        'repo_url': {
+            'type': 'string',
+        },
+        'commits': {
+            'type': 'string',
+        },
+        'commits_url': {
+            'type': 'string',
+        },
+    }
+}
+
+github_repositories = {
+    'schema': {
+
+        'id': {
+            'type': 'string',
+        },
+        'actor': {
+            'actor': 'string',
+        },
+        'name': {
+            'actor': 'string',
+        },
+        'display_name': {
+            'type': 'string',
+        },
+        'private': {
+            'type': 'string',
+        },
+        'owner': {
+            'type': 'string',
+        },
+        'repo_url': {
+            'type': 'string',
+        },
+        'commits': {
+            'type': 'string',
+        },
+        'commits_url': {
+            'type': 'string',
+        },
+        'labels_url': {
+            'type': 'string',
+        },
+        'created_at': {
+            'type': 'string',
+        },
+        'updated_at': {
+            'type': 'string',
+        },
+    }
+}
+
 # Our API will expose two resources (MongoDB collections): 'people' and
 # 'works'. In order to allow for proper data validation, we define beaviour
 # and structure.
@@ -119,6 +214,7 @@ works = {
 # The DOMAIN dict explains which resources will be available and how they will
 # be accessible to the API consumer.
 DOMAIN = {
-    'people': people,
-    'works': works,
+    'github_commits': github_commits,
+    'github_events': github_events,
+    'github_repositories': github_repositories
 }
