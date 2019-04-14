@@ -30,24 +30,48 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item {{ 'font-weight-bold' if request.path == '/github-commits' or request.path == '/mine-github' else '' }}">
-                <a class="nav-link" href="/github-commits?actor={{ github_user }}">GitHub Commits</a>
-            </li>
-            <li class="nav-item {{ 'font-weight-bold' if request.path == '/github-repositories' else '' }}">
-                <a class="nav-link" href="/github-repositories?actor={{ github_user }}">GitHub Repositories</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ 'font-weight-bold' if request.path == '/github-events' else '' }}"
-                   href="/github-events?actor={{ github_user }}">GitHub Events</a>
-            </li>
-        </ul>
+        <div class="col">
+            <div class="row">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item font-weight-light font-italic">
+                        <a class="ml-1 p-1 small nav-link" href="/github-commits?actor={{ github_user }}">GitHub</a>
+                    </li>
+                    <li>
+                        <p class="mx-1 mb-0 p-0 nav-link">|</p>
+                    </li>
+                    <li class="nav-item font-weight-light">
+                        <a class="p-1 small nav-link" href="/school-sessions?actor={{ github_user }}">School</a>
+                    </li>
+                    <li>
+                        <p class="mx-1 mb-0 p-0 nav-link">|</p>
+                    </li>
+                    <li class="nav-item font-weight-light">
+                        <a class="p-1 small nav-link" href="#">Twitter</a>
+                    </li>
+                </ul>
+            </div>
+            <hr style="position: relative; left: -10px" class="m-0 px-0 pt-0 pb-1"/>
+            <div class="row">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item {{ 'font-weight-bold' if request.path in ['/github-commits', '/mine-github', '/dashboard'] else '' }}">
+                        <a class="pt-0 nav-link" href="/github-commits?actor={{ github_user }}">Commits</a>
+                    </li>
+                    <li class="nav-item {{ 'font-weight-bold' if request.path == '/github-repositories' else '' }}">
+                        <a class="pt-0 nav-link" href="/github-repositories?actor={{ github_user }}">Repositories</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div style="min-height: 45px" class="col">
+            <div class="align-top row">
+                <button class="mr-1 ml-auto btn btn-outline-secondary" onclick="githubHarvestModal()">Mine Github
+                </button>
 
-        <button class="mr-1 ml-auto btn btn-outline-secondary" onclick="githubHarvestModal()">Mine Github</button>
-
-        <h5 class="my-0 mr-4 ml-4 font-weight-normal">
-            <small class="mr-2 font-italic">Actor:</small>
-            {{ github_user }}</h5>
+                <h5 class="my-0 mr-4 ml-4 font-weight-normal">
+                    <small class="mr-2 font-italic">Actor:</small>
+                    {{ github_user }}</h5>
+            </div>
+        </div>
     </div>
 </nav>
 

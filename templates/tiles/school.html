@@ -23,24 +23,52 @@
 
 <!-- Content Banner -->
 <nav class="mx-2 mt-0 mb-2 pt-1 pb-0 pr-0 pl-2 navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="/school?actor={{ actor }}">
+    <a class="navbar-brand" href="/dashboard?actor={{ github_user }}">
         <img style="height:45px" class="mb-0 pb-0" src="{{ url_for('static', filename='images/logo.png') }}"/>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item {{ 'font-weight-bold' if request.path == '/school-sessions'  else '' }}">
-                <a class="nav-link" href="/school-sessions?actor={{ actorf }}">School Sessions</a>
-            </li>
-        </ul>
+        <div class="col">
+            <div class="row">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item font-weight-light">
+                        <a class="ml-1 p-1 small nav-link" href="/github-commits?actor={{ actor }}">GitHub</a>
+                    </li>
+                    <li>
+                        <p class="mx-1 mb-0 p-0 nav-link">|</p>
+                    </li>
+                    <li class="nav-item font-weight-light font-italic">
+                        <a class="p-1 small nav-link" href="/school-sessions?actor={{ actor }}">School</a>
+                    </li>
+                    <li>
+                        <p class="mx-1 mb-0 p-0 nav-link">|</p>
+                    </li>
+                    <li class="nav-item font-weight-light">
+                        <a class="p-1 small nav-link" href="#">Twitter</a>
+                    </li>
+                </ul>
+            </div>
+            <hr style="position: relative; left: -10px" class="m-0 px-0 pt-0 pb-1"/>
+            <div class="row">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item {{ 'font-weight-bold' if request.path == '/school-sessions'  else '' }}">
+                        <a class="pt-0 nav-link" href="/school-sessions?actor={{ actor }}">School Sessions</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div style="min-height: 45px" class="col">
+            <div class="align-top row">
+                <button class="mr-1 ml-auto btn btn-outline-secondary" onclick="schoolHarvestModal()">Mine Sessions
+                </button>
 
-        <button class="mr-1 ml-auto btn btn-outline-secondary" onclick="schoolHarvestModal()">Mine Sessions</button>
-
-        <h5 class="my-0 mr-4 ml-4 font-weight-normal">
-            <small class="mr-2 font-italic">Actor:</small>
-            {{ actor }}</h5>
+                <h5 class="my-0 mr-4 ml-4 font-weight-normal">
+                    <small class="mr-2 font-italic">Actor:</small>
+                    {{ actor }}</h5>
+            </div>
+        </div>
     </div>
 </nav>
 
