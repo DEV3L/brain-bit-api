@@ -11,6 +11,7 @@ from app.harvesters.school_harvester import SchoolHarvester
 
 DATE_FORMAT = "%m/%d/%Y"
 
+
 # DAOs
 school_session_dao = SchoolSessionDao(MongoDatabase())
 
@@ -69,10 +70,14 @@ def register_school_controllers(app):
         for day in days_range:
             day_date = datetime.strptime(day, DATE_FORMAT)
 
-            # TODO: totals
-            day_school_sessions = len(
-                [school_session for school_session in school_sessions_to_display if day_date == school_session['date']])
-            data = {'x': f' new Date({day_date.year}, {day_date.month - 1}, {day_date.day}) ', 'y': day_school_sessions}
+            day_school_sessions = [school_session for school_session in school_sessions_to_display if
+                                   day_date == parser.parse(school_session['date'].split(" ")[0])]
+
+            day_duration = 0
+            for school_session in day_school_sessions:
+                day_duration += float(school_session['duration'])
+
+            data = {'x': f' new Date({day_date.year}, {day_date.month - 1}, {day_date.day}) ', 'y': day_duration}
 
             grid_data.append(data)
 
