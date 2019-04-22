@@ -118,34 +118,35 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 
-    {% block javascript %}{% endblock %}
+{% block javascript %}{% endblock %}
 
 
-    <script>
-        function githubHarvestModal() {
-            $("#github-harvest-modal").modal();
-        }
+<script>
+    function githubHarvestModal() {
+        $("#github-harvest-modal").modal();
+    }
 
-        $(document).ready(function () {
-            var githubUsername = $('#github-username').val();
-            $("#mine-github-form").submit(function (event) {
-                setTimeout(function () {
-                    window.location = "/github-commits?actor=" + githubUsername
-                }, 5000);
+    $(document).ready(function () {
+        var githubUsername = $('#github-username').val();
+        $("#mine-github-form").submit(function (event) {
+            setTimeout(function () {
+                window.location = "/github-commits?actor=" + githubUsername
+            }, 5000);
 
-                $("#mine-github-form").hide();
-                $("#loading-icon").show();
-                $("#mine-github-form").submit();
-            });
-        })
-    </script>
+            $("#mine-github-form").hide();
+            $("#loading-icon").show();
+            $("#mine-github-form").submit();
+        });
+    })
+</script>
 
 
 </body>
