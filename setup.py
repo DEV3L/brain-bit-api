@@ -11,7 +11,7 @@ setup(
     name='brain-bit-api',
     packages=find_packages(),
     version='0.1',
-    description='Python Eve App for managing the nlp data engine for Medasync Processing Engine',
+    description='Python Eve App engine for Brain-Bit',
     author='Dev3l Solutions',
     install_requires=[
         requirements
