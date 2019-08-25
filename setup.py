@@ -8,7 +8,7 @@ with open('requirements.txt') as file:
             requirements.append(line)
 
 setup(
-    name='medasync-processing-enginer',
+    name='brain-bit-api',
     packages=find_packages(),
     version='0.1',
     description='Python Eve App for managing the nlp data engine for Medasync Processing Engine',
