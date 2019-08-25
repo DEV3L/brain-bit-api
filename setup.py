@@ -12,7 +12,7 @@ setup(
     packages=find_packages(),
     version='0.1',
     description='Python Eve App for managing the nlp data engine for Medasync Processing Engine',
-    author='Skiplist',
+    author='Dev3l Solutions',
     install_requires=[
         requirements
     ],
